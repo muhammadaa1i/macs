@@ -1,27 +1,46 @@
-import { useState } from 'react'
-import './App.css'
+import { useEffect, useState } from "react"
 
-const App = () => {
-  const [isOpen, setIsOpen] = useState(false)
+export default function App() {
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    fetch('https://682858716b7628c52912ff44.mockapi.io/pc')
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Something went wrong')
+        }
+        return res.json()
+      })
+      .then((result) => {
+        console.log(result);
+        setData(result)
+        setLoading(false)
+      })
+      .catch((err) => {
+        setError(err.message)
+        setLoading(false)
+      })
+  }, [])
+
+  if (loading) {
+    return <h1>Loading...</h1>
+  }
+
+  if (error) {
+    return <h1>Error: {error}</h1>
+  }
 
   return (
     <div>
-      {isOpen && (
-        <div className="modal">
-          <button
-            onClick={() => setIsOpen(false)}
-          >X</button>
-          <h3>Тоp 10 cmc pairs</h3>
-          <h3>Mene coins</h3>
-          <h3>Margin trading x10</h3>
+      <h1>Products</h1>
+      {data.map((item) => (
+        <div key={item.id}>
+          <h1>{item.name}</h1> 
+          <img style={{width:300, height:300}} src={item.avatar} alt="" />         
         </div>
-      )}
-
-      <button
-        onClick={() => setIsOpen(true)}
-        className='openBtn'>Open</button>
+      ))}
     </div>
   )
 }
-
-export default App
